@@ -1,0 +1,85 @@
+-- ============================================================
+-- Script: Add Database Files & Configure Auto-Growth
+-- Description: Templates for adding new data/log files and
+--              configuring appropriate auto-growth settings.
+-- Applies to: SQL Server 2008 and later
+-- BEST PRACTICE: Pre-size files to avoid frequent auto-growth.
+--                Use fixed-size growth increments, not percentages.
+-- ============================================================
+
+-- -------------------------------------------------------
+-- 1. Add a new data file to an existing filegroup
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- ALTER DATABASE [<DatabaseName>]
+--     ADD FILE
+--     (
+--         NAME           = N'<LogicalFileName>',
+--         FILENAME       = N'D:\SQLData\<PhysicalFileName>.ndf',
+--         SIZE           = 10240 MB,      -- initial size
+--         MAXSIZE        = UNLIMITED,
+--         FILEGROWTH     = 1024 MB        -- fixed increment (not %)
+--     )
+--     TO FILEGROUP [PRIMARY];             -- or a named filegroup
+-- GO
+
+-- -------------------------------------------------------
+-- 2. Add a new log file
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- ALTER DATABASE [<DatabaseName>]
+--     ADD LOG FILE
+--     (
+--         NAME           = N'<LogicalLogFileName>',
+--         FILENAME       = N'L:\SQLLogs\<PhysicalLogFileName>.ldf',
+--         SIZE           = 4096 MB,
+--         MAXSIZE        = UNLIMITED,
+--         FILEGROWTH     = 512 MB
+--     );
+-- GO
+
+-- -------------------------------------------------------
+-- 3. Modify auto-growth on an existing file
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- ALTER DATABASE [<DatabaseName>]
+--     MODIFY FILE
+--     (
+--         NAME       = N'<LogicalFileName>',
+--         FILEGROWTH = 1024 MB
+--     );
+-- GO
+
+-- -------------------------------------------------------
+-- 4. Pre-grow a data file to a target size
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- ALTER DATABASE [<DatabaseName>]
+--     MODIFY FILE
+--     (
+--         NAME = N'<LogicalFileName>',
+--         SIZE = 51200 MB   -- grow to 50 GB
+--     );
+-- GO
+
+-- -------------------------------------------------------
+-- 5. Create a new filegroup and add it
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- ALTER DATABASE [<DatabaseName>] ADD FILEGROUP [<FilegroupName>];
+-- GO
+-- ALTER DATABASE [<DatabaseName>]
+--     ADD FILE
+--     (
+--         NAME       = N'<LogicalFileName>',
+--         FILENAME   = N'D:\SQLData\<PhysicalFileName>.ndf',
+--         SIZE       = 10240 MB,
+--         FILEGROWTH = 1024 MB
+--     )
+--     TO FILEGROUP [<FilegroupName>];
+-- GO
