@@ -101,7 +101,63 @@ sqlserver-toolkit/
 
 ---
 
-## Usage
+## PowerShell Scripts (`powershell/`)
+
+Automation scripts that complement the T-SQL collection.  Each script uses a
+`param()` block with documented parameters — run `Get-Help .\ScriptName.ps1`
+for full usage.
+
+```
+powershell/
+├── health/
+│   └── Invoke-HealthCheck.ps1         # Multi-instance health check; optional HTML report
+├── backup/
+│   └── Invoke-BackupAll.ps1           # FULL / DIFF / LOG backup automation with retention cleanup
+├── availability-groups/
+│   ├── Watch-AGStatus.ps1             # Continuous AG health monitor with email alerts
+│   └── Invoke-AGFailover.ps1          # Orchestrated planned failover with pre-flight checks
+├── maintenance/
+│   └── Invoke-IndexMaintenance.ps1    # Fragmentation-based rebuild / reorganize + sp_updatestats
+└── monitoring/
+    ├── Watch-Blocking.ps1             # Continuous blocking chain monitor with email alerts
+    └── Get-JobFailures.ps1            # SQL Agent failure report across multiple instances
+```
+
+### Quick examples
+
+```powershell
+# Health check across two instances, save HTML report
+.\powershell\health\Invoke-HealthCheck.ps1 -SqlInstances "SQL01","SQL02" -HtmlReport "C:\Reports\health.html"
+
+# Nightly full backup with 14-day retention
+.\powershell\backup\Invoke-BackupAll.ps1 -SqlInstances "SQL01" -BackupRoot "D:\Backups" -BackupType FULL
+
+# Watch AG health every 30s, email on issues
+.\powershell\availability-groups\Watch-AGStatus.ps1 -SqlInstance "SQL01" -IntervalSeconds 30 `
+    -SmtpServer "mail.corp.local" -AlertTo "dba@corp.local" -AlertFrom "sql@corp.local"
+
+# Planned failover with pre-flight checks
+.\powershell\availability-groups\Invoke-AGFailover.ps1 -TargetReplica "SQL02" -AGName "AG_Prod"
+
+# Index maintenance — rebuild >= 30%, reorg >= 10%
+.\powershell\maintenance\Invoke-IndexMaintenance.ps1 -SqlInstance "SQL01" -OnlineRebuild
+
+# Monitor for blocking > 60s, alert via email
+.\powershell\monitoring\Watch-Blocking.ps1 -SqlInstance "SQL01" -BlockingThresholdSeconds 60
+
+# Check for job failures in the last 12 hours
+.\powershell\monitoring\Get-JobFailures.ps1 -SqlInstances "SQL01","SQL02" -LookbackHours 12
+```
+
+### PowerShell requirements
+
+- **SqlServer** module: `Install-Module SqlServer`
+- PowerShell 5.1 or PowerShell 7+
+- Same SQL Server permissions as the equivalent T-SQL scripts (see T-SQL Requirements below)
+
+---
+
+## Usage (T-SQL scripts)
 
 1. Open the desired `.sql` file in **SQL Server Management Studio (SSMS)** or **Azure Data Studio**.
 2. Review the `DECLARE` block at the top of each script and set the variables for your environment (database name, backup path, thresholds, etc.).
