@@ -1,0 +1,66 @@
+-- ============================================================
+-- Script: Create Login, Database User & Assign Roles
+-- Description: Template for creating a SQL or Windows login,
+--              mapping it to a database user, and granting
+--              appropriate roles or object permissions.
+-- Applies to: SQL Server 2008 and later
+-- ============================================================
+
+-- -------------------------------------------------------
+-- 1. Create a SQL Server login (SQL authentication)
+-- -------------------------------------------------------
+-- USE [master];
+-- GO
+-- CREATE LOGIN [<LoginName, sysname, AppUser>]
+--     WITH PASSWORD    = N'<StrongPassword>',
+--          CHECK_POLICY = ON,
+--          CHECK_EXPIRATION = ON,
+--          DEFAULT_DATABASE = [<DatabaseName, sysname, MyDB>];
+-- GO
+
+-- -------------------------------------------------------
+-- 2. Create a Windows login (AD user or group)
+-- -------------------------------------------------------
+-- USE [master];
+-- GO
+-- CREATE LOGIN [DOMAIN\<UserOrGroup>] FROM WINDOWS
+--     WITH DEFAULT_DATABASE = [<DatabaseName, sysname, MyDB>];
+-- GO
+
+-- -------------------------------------------------------
+-- 3. Create a database user mapped to the login
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- CREATE USER [<UserName, sysname, AppUser>]
+--     FOR LOGIN [<LoginName, sysname, AppUser>]
+--     WITH DEFAULT_SCHEMA = [dbo];
+-- GO
+
+-- -------------------------------------------------------
+-- 4. Add user to a fixed database role
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- ALTER ROLE [db_datareader] ADD MEMBER [<UserName>];
+-- ALTER ROLE [db_datawriter] ADD MEMBER [<UserName>];
+-- GO
+
+-- -------------------------------------------------------
+-- 5. Grant specific object permissions
+-- -------------------------------------------------------
+-- USE [<DatabaseName, sysname, MyDB>];
+-- GO
+-- GRANT SELECT, INSERT, UPDATE, DELETE
+--     ON SCHEMA::[dbo]
+--     TO [<UserName>];
+-- GO
+-- GRANT EXECUTE ON OBJECT::[dbo].[<StoredProcName>] TO [<UserName>];
+-- GO
+
+-- -------------------------------------------------------
+-- 6. Revoke / Deny a permission
+-- -------------------------------------------------------
+-- REVOKE SELECT ON OBJECT::[dbo].[SensitiveTable] FROM [<UserName>];
+-- DENY   SELECT ON OBJECT::[dbo].[SensitiveTable] TO   [<UserName>];
+-- GO
